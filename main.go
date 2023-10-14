@@ -34,9 +34,9 @@ func handler(ctx *fasthttp.RequestCtx) {
 					types.Sockets[req.Uuid] = append(types.Sockets[req.Uuid], conn)
 					first = false
 				}
-				fmt.Printf("uuid: %v\n", req.Uuid)
 				auction := types.BidMap[req.Uuid]
 				validBid, auctionEnded := auction.Bid(req)
+
 				if validBid {
 					for _, socket := range types.Sockets[req.Uuid] {
 						socket.WriteJSON(types.SocketReq{
