@@ -3,11 +3,18 @@ import asyncio
 from json import dumps
 from websockets.sync.client import connect
 
-def sendBid():
-    r = requests.get("ws://localhost:8001/connect")
-    if (r.status_code == 200) :
-        with connect("ws://localhost:8001/connect") as ws:
-            ws.send("Hello world!")
+def sendBid(Apr, Uuid, Bidder):
+    with connect("ws://localhost:8001/connect") as ws:
+        ws.send("Hello world!")
+        data = dumps(
+            dict(
+                apr = Apr,
+                uuid = Uuid,
+                bidder = Bidder
+            )
+        )
+        ws.send(data)
+        print(ws.recv())
 
 def createDummyAuction(BondId, SellerId, MaxApr):
     args = dict(
@@ -20,7 +27,8 @@ def createDummyAuction(BondId, SellerId, MaxApr):
 
 
 if __name__ == "__main__":
-    createDummyAuction(0, 0, 0.5)
+    createDummyAuction(0, 0, 10000)
+    sendBid(0, 1, 2)
 
     
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	auctionhandler "lendshare/broker/auctionHandler"
 	"lendshare/broker/types"
 	"time"
@@ -20,6 +21,7 @@ func handler(ctx *fasthttp.RequestCtx) {
 	switch string(ctx.Path()) {
 	case "/connect":
 		err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
+			fmt.Println("WS connection success!")
 			var req types.SocketReq
 			first := true
 			for {
@@ -36,14 +38,16 @@ func handler(ctx *fasthttp.RequestCtx) {
 				validBid, auctionEnded := auction.Bid(req)
 
 				if validBid {
+					fmt.Println("lick my balls")
 					for _, socket := range types.Sockets[req.Uuid] {
 						socket.WriteJSON(types.SocketReq{
 							Apr:    auction.Apr,
+							Uuid:   1,
 							Bidder: auction.HighestBidder,
 						})
 					}
 				}
-
+				
 				if auctionEnded {
 					for _, socket := range types.Sockets[req.Uuid] {
 						socket.Close()
