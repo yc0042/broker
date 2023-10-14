@@ -9,7 +9,16 @@ def sendBid():
         with connect("ws://localhost:8001/connect") as ws:
             ws.send("Hello world!")
 
+def createDummyAuction(BondId, SellerId, MaxApr):
+    args = dict(
+        bondId = BondId,
+        sellerId = SellerId,
+        maxApr = MaxApr
+    )
+    data = requests.post(url = "https://localhost:8001/create_dummy_auction", params = args)
+    print(data.content)
 
+def 
 
     
 
