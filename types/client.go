@@ -7,6 +7,7 @@ import (
 )
 
 var Client *fasthttp.Client
+var Token string
 
 // Initialized fasthttp client
 func InitClient() {

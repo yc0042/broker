@@ -5,8 +5,18 @@ import (
 	"os"
 	"time"
 
+	"github.com/fasthttp/websocket"
 	"github.com/valyala/fasthttp"
 )
+
+type SuccessMessage struct {
+	Valid bool
+}
+
+type SocketClient struct {
+	C    *websocket.Conn
+	Uuid int64
+}
 
 type BatchAuctionReq struct {
 	Uuids []int64 `json:"uuids"`
