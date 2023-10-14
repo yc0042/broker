@@ -27,14 +27,12 @@ func CreateAuction(ctx *fasthttp.RequestCtx) (types.AuctionCreateReq, error) {
 	if err != nil {
 		return types.AuctionCreateReq{}, err
 	}
-	var resBody types.AuctionCreateRes
-	err = json.Unmarshal(res.Body(), &resBody)
 
 	if err != nil {
 		return types.AuctionCreateReq{}, err
 	}
 
-	if resBody.Valid {
+	if res.StatusCode() == 200 {
 		return reqBody, nil
 	}
 

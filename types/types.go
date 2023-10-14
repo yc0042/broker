@@ -9,9 +9,9 @@ import (
 )
 
 type Auction struct {
-	Apr           float64
-	EndTime       int64
-	HighestBidder int64
+	Apr           float64 `json:"apr"`
+	EndTime       int64   `json:"endTime"`
+	HighestBidder int64   `json:"highestBidder"`
 }
 
 type SocketReq struct {
@@ -24,10 +24,6 @@ type AuctionCreateReq struct {
 	BondId   int64   `json:"bondId"`
 	SellerId int64   `json:"sellerId"`
 	MaxApr   float64 `json:"maxApr"`
-}
-
-type AuctionCreateRes struct {
-	Valid bool `json:"valid"`
 }
 
 type AuctionEndReq struct {
@@ -54,7 +50,7 @@ func (a *Auction) Bid(req SocketReq) (bool, bool) {
 		req := fasthttp.AcquireRequest()
 		res := fasthttp.AcquireResponse()
 		req.AppendBody(body)
-		req.SetRequestURI(os.Getenv("DOMAIN_NAME") + "/api/finishAuction")
+		req.SetRequestURI(os.Getenv("DOMAIN_NAME") + "/api/finish_auction")
 
 		err = Client.Do(req, res)
 
