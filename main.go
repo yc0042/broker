@@ -1,9 +1,12 @@
 package main
 
 import (
+	auctionhandler "lendshare/broker/auctionHandler"
 	"lendshare/broker/types"
+	"time"
 
 	"github.com/fasthttp/websocket"
+	"github.com/joho/godotenv"
 	"github.com/valyala/fasthttp"
 )
 
@@ -29,9 +32,9 @@ func handler(ctx *fasthttp.RequestCtx) {
 					first = false
 				}
 				auction := types.BidMap[req.Uuid]
-				s := auction.Bid(req)
+				validBid, auctionEnded := auction.Bid(req)
 
-				if s {
+				if validBid {
 					for _, socket := range types.Sockets[req.Uuid] {
 						socket.WriteJSON(types.SocketReq{
 							Apr:    auction.Apr,
@@ -39,16 +42,39 @@ func handler(ctx *fasthttp.RequestCtx) {
 						})
 					}
 				}
+
+				if auctionEnded {
+					for _, socket := range types.Sockets[req.Uuid] {
+						socket.Close()
+					}
+
+					delete(types.Sockets, req.Uuid)
+				}
 			}
 		})
 
 		if err != nil {
 			panic(err)
 		}
+
+	case "/create_auction":
+		info, err := auctionhandler.CreateAuction(ctx)
+
+		if err != nil {
+			ctx.SetStatusCode(400)
+		}
+
+		tomorrow := time.Now().AddDate(0, 0, 1).UnixNano()
+		types.BidMap[info.BondId] = types.Auction{
+			Apr:     info.MaxApr,
+			EndTime: tomorrow,
+		}
 	}
 }
 
 func main() {
+	godotenv.Load()
+	types.InitClient()
 	types.Init()
 	fasthttp.ListenAndServe("8001", handler)
 }

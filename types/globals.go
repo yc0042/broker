@@ -2,10 +2,10 @@ package types
 
 import "github.com/fasthttp/websocket"
 
-var Sockets map[string][]*websocket.Conn
-var BidMap map[string]Auction
+var Sockets map[int64][]*websocket.Conn
+var BidMap map[int64]Auction
 
 func Init() {
-	Sockets = make(map[string][]*websocket.Conn)
-	BidMap = make(map[string]Auction)
+	Sockets = make(map[int64][]*websocket.Conn)
+	BidMap = make(map[int64]Auction)
 }
