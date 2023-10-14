@@ -1,9 +1,16 @@
 import requests
+import asyncio
+from json import dumps
+from websockets.sync.client import connect
 
-params = dict(
-    apr = 1.47,
-    Uuid = "6451fa94-6aa6-11ee-8c99-0242ac120002",
+def sendBid():
+    r = requests.get("ws://localhost:8001/connect")
+    if (r.status_code == 200) :
+        with connect("ws://localhost:8001/connect") as ws:
+            ws.send("Hello world!")
+
+
+
     
 
 
-)
