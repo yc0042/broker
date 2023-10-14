@@ -59,17 +59,30 @@ func handler(ctx *fasthttp.RequestCtx) {
 			panic(err)
 		}
 
+	case "/create_dummy_auction":
+		var body types.AuctionCreateReq
+		json.Unmarshal(ctx.Request.Body(), &body)
+		types.BidMap[body.BondId] = types.Auction{
+			Apr:     body.MaxApr,
+			EndTime: time.Now().AddDate(0, 0, 1).UnixNano(),
+		}
+
+		ctx.SetStatusCode(200)
+		ctx.Response.AppendBodyString("Success creating auction")
 	case "/create_auction":
 		info, err := auctionhandler.CreateAuction(ctx)
 
 		if err != nil {
 			ctx.SetStatusCode(400)
+			ctx.Response.AppendBodyString("Failure creating auction")
 		} else {
 			tomorrow := time.Now().AddDate(0, 0, 1).UnixNano()
 			types.BidMap[info.BondId] = types.Auction{
 				Apr:     info.MaxApr,
 				EndTime: tomorrow,
 			}
+			ctx.SetStatusCode(200)
+			ctx.Response.AppendBodyString("Success creating auction")
 		}
 
 	case "/get_auctions":
@@ -109,7 +122,7 @@ func handler(ctx *fasthttp.RequestCtx) {
 		if err != nil {
 			ctx.SetStatusCode(500)
 		} else {
-			ctx.Request.AppendBody(ser)
+			ctx.Response.AppendBody(ser)
 		}
 	}
 }
