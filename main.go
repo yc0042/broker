@@ -23,7 +23,7 @@ func handler(ctx *fasthttp.RequestCtx) {
 			var req types.SocketReq
 			first := true
 			for {
-				err := conn.ReadJSON(req)
+				err := conn.ReadJSON(&req)
 				if err != nil {
 					conn.Close()
 					break
