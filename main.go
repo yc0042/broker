@@ -36,6 +36,7 @@ func handler(ctx *fasthttp.RequestCtx) {
 				}
 				auction := types.BidMap[req.Uuid]
 				validBid, auctionEnded := auction.Bid(req)
+				types.BidMap[req.Uuid] = auction
 
 				if validBid {
 					for _, socket := range types.Sockets[req.Uuid] {
