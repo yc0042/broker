@@ -131,5 +131,5 @@ func main() {
 	godotenv.Load()
 	types.InitClient()
 	types.Init()
-	fasthttp.ListenAndServe("8001", handler)
+	fasthttp.ListenAndServe(":8001", handler)
 }
