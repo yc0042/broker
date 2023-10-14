@@ -58,7 +58,8 @@ func handler(ctx *fasthttp.RequestCtx) {
 		if err != nil {
 			panic(err)
 		}
-
+	case "/":
+		ctx.Response.AppendBodyString("hello")
 	case "/create_dummy_auction":
 		var body types.AuctionCreateReq
 		json.Unmarshal(ctx.Request.Body(), &body)
@@ -67,7 +68,6 @@ func handler(ctx *fasthttp.RequestCtx) {
 			EndTime: time.Now().AddDate(0, 0, 1).UnixNano(),
 		}
 
-		ctx.SetStatusCode(200)
 		ctx.Response.AppendBodyString("Success creating auction")
 	case "/create_auction":
 		info, err := auctionhandler.CreateAuction(ctx)

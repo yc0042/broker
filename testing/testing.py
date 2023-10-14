@@ -15,10 +15,12 @@ def createDummyAuction(BondId, SellerId, MaxApr):
         sellerId = SellerId,
         maxApr = MaxApr
     )
-    data = requests.post(url = "https://localhost:8001/create_dummy_auction", params = args)
+    data = requests.post("http://localhost:8001/create_dummy_auction", data = dumps(args))
     print(data.content)
 
-def 
+
+if __name__ == "__main__":
+    createDummyAuction(0, 0, 0.5)
 
     
 
