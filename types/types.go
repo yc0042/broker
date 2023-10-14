@@ -8,10 +8,12 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-type Auction struct {
-	Apr           float64 `json:"apr"`
-	EndTime       int64   `json:"endTime"`
-	HighestBidder int64   `json:"highestBidder"`
+type BatchAuctionReq struct {
+	Uuids []int64 `json:"uuids"`
+}
+
+type BatchAuctionRes struct {
+	Auctions []AuctionEndReq `json:"auctions"`
 }
 
 type SocketReq struct {
@@ -29,6 +31,12 @@ type AuctionCreateReq struct {
 type AuctionEndReq struct {
 	Auction  Auction `json:"auction"`
 	BondUuid int64   `json:"bondUuid"`
+}
+
+type Auction struct {
+	Apr           float64 `json:"apr"`
+	EndTime       int64   `json:"endTime"`
+	HighestBidder int64   `json:"highestBidder"`
 }
 
 func (a *Auction) Bid(req SocketReq) (bool, bool) {

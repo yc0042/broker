@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	auctionhandler "lendshare/broker/auctionHandler"
 	"lendshare/broker/types"
 	"time"
@@ -49,6 +50,7 @@ func handler(ctx *fasthttp.RequestCtx) {
 					}
 
 					delete(types.Sockets, req.Uuid)
+					delete(types.BidMap, req.Uuid)
 				}
 			}
 		})
@@ -62,12 +64,52 @@ func handler(ctx *fasthttp.RequestCtx) {
 
 		if err != nil {
 			ctx.SetStatusCode(400)
+		} else {
+			tomorrow := time.Now().AddDate(0, 0, 1).UnixNano()
+			types.BidMap[info.BondId] = types.Auction{
+				Apr:     info.MaxApr,
+				EndTime: tomorrow,
+			}
 		}
 
-		tomorrow := time.Now().AddDate(0, 0, 1).UnixNano()
-		types.BidMap[info.BondId] = types.Auction{
-			Apr:     info.MaxApr,
-			EndTime: tomorrow,
+	case "/get_auctions":
+		var body types.BatchAuctionReq
+		err := json.Unmarshal(ctx.Request.Body(), &body)
+
+		var out []types.AuctionEndReq
+
+		out = make([]types.AuctionEndReq, 0)
+
+		if err != nil {
+			ctx.SetStatusCode(400)
+		} else {
+			if len(body.Uuids) == 0 {
+				for uuid, auction := range types.BidMap {
+					out = append(out, types.AuctionEndReq{
+						BondUuid: uuid,
+						Auction:  auction,
+					})
+				}
+			} else {
+				for _, uuid := range body.Uuids {
+					out = append(out, types.AuctionEndReq{
+						BondUuid: uuid,
+						Auction:  types.BidMap[uuid],
+					})
+				}
+			}
+		}
+
+		res := types.BatchAuctionRes{
+			Auctions: out,
+		}
+
+		ser, err := json.Marshal(res)
+
+		if err != nil {
+			ctx.SetStatusCode(500)
+		} else {
+			ctx.Request.AppendBody(ser)
 		}
 	}
 }
