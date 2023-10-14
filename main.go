@@ -34,20 +34,19 @@ func handler(ctx *fasthttp.RequestCtx) {
 					types.Sockets[req.Uuid] = append(types.Sockets[req.Uuid], conn)
 					first = false
 				}
+				fmt.Printf("uuid: %v\n", req.Uuid)
 				auction := types.BidMap[req.Uuid]
 				validBid, auctionEnded := auction.Bid(req)
-
 				if validBid {
-					fmt.Println("lick my balls")
 					for _, socket := range types.Sockets[req.Uuid] {
 						socket.WriteJSON(types.SocketReq{
 							Apr:    auction.Apr,
-							Uuid:   1,
+							Uuid:   req.Uuid,
 							Bidder: auction.HighestBidder,
 						})
 					}
 				}
-				
+
 				if auctionEnded {
 					for _, socket := range types.Sockets[req.Uuid] {
 						socket.Close()
@@ -71,7 +70,6 @@ func handler(ctx *fasthttp.RequestCtx) {
 			Apr:     body.MaxApr,
 			EndTime: time.Now().AddDate(0, 0, 1).UnixNano(),
 		}
-
 		ctx.Response.AppendBodyString("Success creating auction")
 	case "/create_auction":
 		info, err := auctionhandler.CreateAuction(ctx)

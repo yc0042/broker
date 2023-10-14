@@ -5,7 +5,6 @@ from websockets.sync.client import connect
 
 def sendBid(Apr, Uuid, Bidder):
     with connect("ws://localhost:8001/connect") as ws:
-        ws.send("Hello world!")
         data = dumps(
             dict(
                 apr = Apr,
@@ -14,7 +13,8 @@ def sendBid(Apr, Uuid, Bidder):
             )
         )
         ws.send(data)
-        print(ws.recv())
+        msg = ws.recv()
+        print(msg)
 
 def createDummyAuction(BondId, SellerId, MaxApr):
     args = dict(
@@ -28,7 +28,7 @@ def createDummyAuction(BondId, SellerId, MaxApr):
 
 if __name__ == "__main__":
     createDummyAuction(0, 0, 10000)
-    sendBid(0, 1, 2)
+    sendBid(1, 0, 2)
 
     
 
