@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"time"
 
@@ -41,7 +40,6 @@ type Auction struct {
 }
 
 func (a *Auction) Bid(req SocketReq) (bool, bool) {
-	fmt.Println(req.Apr < a.Apr)
 	if req.Apr < a.Apr && time.Now().UnixNano() < a.EndTime {
 		a.Apr = req.Apr
 		a.HighestBidder = req.Bidder
