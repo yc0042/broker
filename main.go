@@ -67,11 +67,18 @@ func handler(ctx *fasthttp.RequestCtx) {
 	case "/create_dummy_auction":
 		var body types.AuctionCreateReq
 		json.Unmarshal(ctx.Request.Body(), &body)
-		types.BidMap[body.BondId] = types.Auction{
-			Apr:     body.MaxApr,
-			EndTime: time.Now().AddDate(0, 0, 1).UnixNano(),
+		_, ok := types.BidMap[body.BondId]
+		if ok {
+			ctx.SetStatusCode(401)
+			ctx.Response.AppendBodyString("Selected bond already has a created auction!")
+		} else {
+			types.BidMap[body.BondId] = types.Auction{
+				Apr:     body.MaxApr,
+				EndTime: time.Now().AddDate(0, 0, 1).UnixNano(),
+			}
+			ctx.Response.AppendBodyString("Success creating auction")
 		}
-		ctx.Response.AppendBodyString("Success creating auction")
+		
 	case "/create_auction":
 		info, err := auctionhandler.CreateAuction(ctx)
 
