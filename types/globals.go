@@ -1,9 +1,9 @@
 package types
 
-var Sockets map[int64][]SocketClient
-var BidMap map[int64]Auction
+var Sockets map[string][]SocketClient
+var BidMap map[string]Auction
 
 func Init() {
-	Sockets = make(map[int64][]SocketClient)
-	BidMap = make(map[int64]Auction)
+	Sockets = make(map[string][]SocketClient)
+	BidMap = make(map[string]Auction)
 }

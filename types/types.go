@@ -15,38 +15,38 @@ type SuccessMessage struct {
 
 type SocketClient struct {
 	C    *websocket.Conn
-	Uuid int64
+	Uuid string
 }
 
 type BatchAuctionReq struct {
-	Uuids []int64 `json:"uuids"`
+	Uuids []string `json:"uuids"`
 }
 
 type BatchAuctionRes struct {
-	Auctions []AuctionEndReq `json:"auctions"`
+	Aprs map[string]float64 `json:"aprs"`
 }
 
 type SocketReq struct {
 	Apr    float64 `json:"apr"`
-	Uuid   int64   `json:"uuid"`
-	Bidder int64   `json:"bidder"`
+	Uuid   string  `json:"uuid"`
+	Bidder string  `json:"bidder"`
 }
 
 type AuctionCreateReq struct {
-	BondId   int64   `json:"bondId"`
-	SellerId int64   `json:"sellerId"`
+	BondId   string  `json:"bondId"`
+	SellerId string  `json:"sellerId"`
 	MaxApr   float64 `json:"maxApr"`
 }
 
 type AuctionEndReq struct {
 	Auction  Auction `json:"auction"`
-	BondUuid int64   `json:"bondUuid"`
+	BondUuid string  `json:"bondUuid"`
 }
 
 type Auction struct {
 	Apr           float64 `json:"apr"`
 	EndTime       int64   `json:"endTime"`
-	HighestBidder int64   `json:"highestBidder"`
+	HighestBidder string  `json:"highestBidder"`
 }
 
 func (a *Auction) Bid(req SocketReq) (bool, bool) {
@@ -65,10 +65,11 @@ func (a *Auction) Bid(req SocketReq) (bool, bool) {
 			return false, false
 		}
 
+		uuid := req.Uuid
 		req := fasthttp.AcquireRequest()
 		res := fasthttp.AcquireResponse()
 		req.AppendBody(body)
-		req.SetRequestURI(os.Getenv("DOMAIN_NAME") + "/api/finish_auction")
+		req.SetRequestURI(os.Getenv("DOMAIN_NAME") + "/api/finish_auction/" + uuid)
 
 		err = Client.Do(req, res)
 

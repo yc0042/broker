@@ -31,20 +31,20 @@ def getAllAuctions():
 
 if __name__ == "__main__":
     # seller: 0 creates auction for bond: 0 with maxapr: 15%
-    createDummyAuction(0, 0, 0.15)
+    # createDummyAuction(0, 0, 0.15)
 
     # buyer: 1 bids on bond: 0 with apr: 13%
     sendBid(0.13, 0, 1)
 
     # buyer: 2 bids on bond: 0 with apr: 10%
-    sendBid(0.10, 0, 2)
+    # sendBid(0.10, 0, 2)
 
     # seller: 3 creates auction for bond: 1 with maxapr: 12%
-    createDummyAuction(1, 3, 12)
-    getAllAuctions()
+    # createDummyAuction(1, 3, 12)
+    # getAllAuctions()
 
     # seller: 1 attempts to create auction for bond: 0 with maxapr: -1%
-    createDummyAuction(0, 1, -0.01)
+    # createDummyAuction(0, 1, -0.01)
     getAllAuctions()
 
 

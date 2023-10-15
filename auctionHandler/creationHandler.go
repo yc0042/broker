@@ -20,7 +20,8 @@ func CreateAuction(ctx *fasthttp.RequestCtx) (types.AuctionCreateReq, error) {
 
 	req := fasthttp.AcquireRequest()
 	req.AppendBody(ctx.Request.Body())
-	req.SetRequestURI(os.Getenv("DOMAIN_NAME") + "/api/create_auction")
+	req.Header.SetMethod(fasthttp.MethodPost)
+	req.SetRequestURI(os.Getenv("DOMAIN_NAME") + "/api/create_auction/" + reqBody.BondId)
 	res := fasthttp.AcquireResponse()
 	err = types.Client.Do(req, res)
 

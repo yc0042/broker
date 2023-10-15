@@ -69,29 +69,30 @@ func handler(ctx *fasthttp.RequestCtx) {
 		}
 	case "/":
 		ctx.Response.AppendBodyString("hello")
-	case "/create_dummy_auction":
-		var body types.AuctionCreateReq
-		json.Unmarshal(ctx.Request.Body(), &body)
-		_, ok := types.BidMap[body.BondId]
-		if ok {
-			ctx.SetStatusCode(401)
-			ctx.Response.AppendBodyString("Selected bond already has a created auction!")
-		} else {
-			types.BidMap[body.BondId] = types.Auction{
-				Apr:     body.MaxApr,
-				EndTime: time.Now().AddDate(0, 0, 1).UnixNano(),
-			}
-			ctx.Response.AppendBodyString("Success creating auction")
-		}
-		
+	// case "/create_dummy_auction":
+	// 	var body types.AuctionCreateReq
+	// 	json.Unmarshal(ctx.Request.Body(), &body)
+	// 	_, ok := types.BidMap[body.BondId]
+	// 	if ok {
+	// 		ctx.SetStatusCode(401)
+	// 		ctx.Response.AppendBodyString("Selected bond already has a created auction!")
+	// 	} else {
+	// 		types.BidMap[body.BondId] = types.Auction{
+	// 			Apr:     body.MaxApr,
+	// 			EndTime: time.Now().AddDate(0, 0, 1).UnixNano(),
+	// 		}
+	// 		ctx.Response.AppendBodyString("Success creating auction")
+	// 	}
+
 	case "/create_auction":
 		info, err := auctionhandler.CreateAuction(ctx)
 
 		if err != nil {
+			fmt.Println(err.Error())
 			ctx.SetStatusCode(400)
 			ctx.Response.AppendBodyString("Failure creating auction")
 		} else {
-			tomorrow := time.Now().AddDate(0, 0, 1).UnixNano()
+			tomorrow := time.Now().Add(time.Minute).UnixNano()
 			types.BidMap[info.BondId] = types.Auction{
 				Apr:     info.MaxApr,
 				EndTime: tomorrow,
@@ -104,32 +105,30 @@ func handler(ctx *fasthttp.RequestCtx) {
 		var body types.BatchAuctionReq
 		err := json.Unmarshal(ctx.Request.Body(), &body)
 
-		var out []types.AuctionEndReq
+		var out map[string]float64
 
-		out = make([]types.AuctionEndReq, 0)
+		out = make(map[string]float64)
 
 		if err != nil {
 			ctx.SetStatusCode(400)
 		} else {
 			if len(body.Uuids) == 0 {
 				for uuid, auction := range types.BidMap {
-					out = append(out, types.AuctionEndReq{
-						BondUuid: uuid,
-						Auction:  auction,
-					})
+					out[uuid] = auction.Apr
 				}
 			} else {
+
 				for _, uuid := range body.Uuids {
-					out = append(out, types.AuctionEndReq{
-						BondUuid: uuid,
-						Auction:  types.BidMap[uuid],
-					})
+					val, ok := types.BidMap[uuid]
+					if ok {
+						out[uuid] = val.Apr
+					}
 				}
 			}
 		}
 
 		res := types.BatchAuctionRes{
-			Auctions: out,
+			Aprs: out,
 		}
 
 		ser, err := json.Marshal(res)
